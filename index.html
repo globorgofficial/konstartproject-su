@@ -1,13 +1,748 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>KONSTART PROJECT</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KONSTART PROJECT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Unbounded:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;
+  --surface:#111;
+  --surface2:#181818;
+  --border:#2a2a2a;
+  --accent:#e8e000;
+  --accent2:#00e8b0;
+  --text:#f0f0f0;
+  --muted:#666;
+  --danger:#e84040;
+  --mono:'Share Tech Mono',monospace;
+  --display:'Unbounded',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,10,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;height:56px;gap:2rem}
+.nav-logo{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:0.12em;color:var(--accent);text-decoration:none;flex-shrink:0}
+.nav-links{display:flex;gap:1.5rem;margin-left:auto;align-items:center}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:11px;letter-spacing:0.08em;transition:color 0.2s}
+.nav-links a:hover{color:var(--text)}
+.nav-btn{background:var(--accent);color:#000;border:none;padding:7px 16px;font-family:var(--mono);font-size:11px;letter-spacing:0.08em;cursor:pointer;transition:opacity 0.2s}
+.nav-btn:hover{opacity:0.85}
+
+/* PAGE SYSTEM */
+.page{display:none;min-height:100vh;padding-top:56px}
+.page.active{display:block}
+
+/* HERO */
+#page-home{padding-top:0}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:7rem 3rem 4rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,var(--border) 39px,var(--border) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,var(--border) 39px,var(--border) 40px);opacity:0.25;pointer-events:none}
+.hero-tag{font-size:10px;letter-spacing:0.2em;color:var(--accent);margin-bottom:1.5rem;text-transform:uppercase}
+.hero-title{font-family:var(--display);font-size:clamp(2.5rem,7vw,6rem);font-weight:600;line-height:1.0;letter-spacing:-0.02em;margin-bottom:2rem}
+.hero-title span{color:var(--accent)}
+.hero-desc{max-width:520px;font-size:13px;line-height:1.8;color:#aaa;margin-bottom:3rem}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-primary{background:var(--accent);color:#000;border:none;padding:12px 28px;font-family:var(--mono);font-size:12px;letter-spacing:0.1em;cursor:pointer;transition:all 0.2s;text-transform:uppercase}
+.btn-primary:hover{background:#fff;color:#000}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border);padding:12px 28px;font-family:var(--mono);font-size:12px;letter-spacing:0.1em;cursor:pointer;transition:all 0.2s;text-transform:uppercase}
+.btn-outline:hover{border-color:var(--text)}
+.hero-stats{display:flex;gap:3rem;margin-top:4rem;padding-top:2rem;border-top:1px solid var(--border)}
+.stat-item label{display:block;font-size:10px;color:var(--muted);letter-spacing:0.15em;margin-bottom:4px}
+.stat-item strong{font-family:var(--display);font-size:1.6rem;font-weight:300;color:var(--accent)}
+
+/* SECTIONS */
+.section{padding:5rem 3rem;border-top:1px solid var(--border)}
+.section-tag{font-size:10px;letter-spacing:0.2em;color:var(--accent2);margin-bottom:1rem;text-transform:uppercase}
+.section-title{font-family:var(--display);font-size:clamp(1.4rem,3vw,2.4rem);font-weight:400;margin-bottom:1rem}
+.section-sub{font-size:12px;color:var(--muted);line-height:1.8;max-width:600px;margin-bottom:3rem}
+
+/* CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:var(--border)}
+.card{background:var(--surface);padding:2rem;transition:background 0.2s}
+.card:hover{background:var(--surface2)}
+.card-icon{width:40px;height:40px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;font-size:18px}
+.card-title{font-family:var(--display);font-size:13px;font-weight:400;margin-bottom:0.75rem;letter-spacing:0.05em}
+.card-text{font-size:11px;color:var(--muted);line-height:1.8}
+
+/* NEWS */
+.news-list{display:flex;flex-direction:column;gap:1px;background:var(--border)}
+.news-item{background:var(--surface);padding:1.5rem 2rem;display:flex;gap:2rem;align-items:flex-start;transition:background 0.2s;cursor:pointer}
+.news-item:hover{background:var(--surface2)}
+.news-date{font-size:10px;color:var(--muted);letter-spacing:0.1em;flex-shrink:0;padding-top:2px;min-width:80px}
+.news-title{font-size:13px;margin-bottom:0.4rem}
+.news-preview{font-size:11px;color:var(--muted);line-height:1.7}
+.news-tag{display:inline-block;background:var(--accent);color:#000;font-size:9px;padding:2px 8px;letter-spacing:0.1em;margin-bottom:0.5rem}
+
+/* VACANCIES */
+.vacancy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--border)}
+.vacancy-card{background:var(--surface);padding:1.5rem;cursor:pointer;transition:background 0.2s}
+.vacancy-card:hover{background:var(--surface2)}
+.vacancy-card h4{font-family:var(--display);font-size:12px;font-weight:400;margin-bottom:0.5rem}
+.vacancy-card p{font-size:11px;color:var(--muted)}
+.vacancy-badge{display:inline-block;font-size:9px;padding:2px 8px;letter-spacing:0.1em;margin-top:0.75rem}
+.badge-open{background:rgba(0,232,176,0.12);color:var(--accent2);border:1px solid rgba(0,232,176,0.3)}
+.badge-closed{background:rgba(102,102,102,0.12);color:var(--muted);border:1px solid var(--border)}
+
+/* MODAL OVERLAY */
+.overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.85);overflow-y:auto;padding:2rem}
+.overlay.open{display:flex;align-items:flex-start;justify-content:center;padding-top:3rem}
+.modal{background:var(--surface);border:1px solid var(--border);max-width:640px;width:100%;padding:2.5rem;position:relative}
+.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;font-family:var(--mono);line-height:1}
+.modal-close:hover{color:var(--text)}
+.modal-title{font-family:var(--display);font-size:16px;font-weight:400;margin-bottom:0.5rem}
+.modal-step{font-size:10px;color:var(--accent);letter-spacing:0.15em;margin-bottom:2rem}
+
+/* FORM */
+.form-group{margin-bottom:1.25rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-group label{display:block;font-size:10px;letter-spacing:0.12em;color:var(--muted);margin-bottom:6px;text-transform:uppercase}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:10px 12px;outline:none;transition:border-color 0.2s;resize:vertical}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
+.form-group select{appearance:none;cursor:pointer}
+.form-group textarea{min-height:80px}
+.checkbox-group{display:flex;align-items:flex-start;gap:10px;margin-bottom:1rem}
+.checkbox-group input[type=checkbox]{width:14px;height:14px;flex-shrink:0;margin-top:2px;accent-color:var(--accent);cursor:pointer}
+.checkbox-group label{font-size:11px;color:var(--muted);line-height:1.6;cursor:pointer}
+.checkbox-group a{color:var(--accent);text-decoration:none}
+.form-error{font-size:10px;color:var(--danger);margin-top:4px;display:none}
+.form-error.show{display:block}
+
+/* SIGNATURE */
+.sig-area{border:1px solid var(--border);background:var(--bg);position:relative;margin:1rem 0}
+#sig-canvas{display:block;width:100%;height:180px;cursor:crosshair;touch-action:none}
+.sig-warning{font-size:11px;color:var(--muted);line-height:1.7;padding:1rem;border:1px solid var(--border);background:rgba(232,224,0,0.04);border-left:3px solid var(--accent);margin-bottom:1rem}
+.sig-actions{display:flex;gap:0.75rem;margin-top:0.75rem}
+.btn-sm{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:10px;padding:6px 14px;cursor:pointer;transition:all 0.2s;letter-spacing:0.08em}
+.btn-sm:hover{border-color:var(--text);color:var(--text)}
+
+/* CONTRACT VIEW */
+.contract-doc{background:#fff;color:#111;padding:3rem;font-family:serif;font-size:13px;line-height:1.9;max-height:400px;overflow-y:auto;margin-bottom:1.5rem;border:1px solid var(--border)}
+.contract-doc h2{font-size:16px;text-align:center;margin-bottom:1.5rem;font-family:sans-serif}
+.contract-doc p{margin-bottom:1rem}
+.contract-doc .field{font-weight:bold;color:#1a3a8f}
+
+/* SUCCESS */
+.success-box{text-align:center;padding:3rem 2rem}
+.success-box .check{width:60px;height:60px;border:1px solid var(--accent2);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:24px;color:var(--accent2)}
+.success-box h3{font-family:var(--display);font-size:18px;font-weight:400;margin-bottom:1rem}
+.success-box p{font-size:12px;color:var(--muted);line-height:1.8;max-width:380px;margin:0 auto 1.5rem}
+.creds-box{background:var(--bg);border:1px solid var(--border);padding:1.25rem;text-align:left;margin:1.5rem auto;max-width:320px}
+.creds-box .cred-row{display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border)}
+.creds-box .cred-row:last-child{border:none}
+.creds-box .cred-label{color:var(--muted)}
+.creds-box .cred-val{color:var(--accent);letter-spacing:0.05em}
+
+/* DIVIDER */
+hr.div{border:none;border-top:1px solid var(--border);margin:0}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border)}
+
+/* BOTTOM */
+footer{padding:2rem 3rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--muted);letter-spacing:0.08em}
+footer a{color:var(--muted);text-decoration:none}
+footer a:hover{color:var(--text)}
+
+@media(max-width:600px){
+  .form-row{grid-template-columns:1fr}
+  .hero{padding:6rem 1.5rem 3rem}
+  .section{padding:3rem 1.5rem}
+  nav{padding:0 1rem;gap:1rem}
+  .nav-links a{display:none}
+  footer{flex-direction:column;gap:0.5rem;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#" onclick="showPage('home')">KONSTART PROJECT</a>
+  <div class="nav-links">
+    <a href="#" onclick="showPage('home')">Главная</a>
+    <a href="#" onclick="showPage('news')">Новости</a>
+    <a href="#" onclick="showPage('vacancies')">Вакансии</a>
+    <a href="#" onclick="showPage('docs')">Документы</a>
+    <a href="#" onclick="showPage('ost')">OST</a>
+    <button class="nav-btn" onclick="openRegistration()">Подать заявку</button>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div id="page-home" class="page active">
+  <section class="hero">
+    <div class="hero-tag">// Minecraft Project — G.L.o.B. org.</div>
+    <h1 class="hero-title">KONSTART<br><span>PROJECT</span></h1>
+    <p class="hero-desc">Масштабный творческий проект в игровой вселенной Minecraft. Мы строим мир — со своей историей, музыкой, архитектурой и людьми. Присоединяйся к команде.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="openRegistration()">Подать заявку</button>
+      <button class="btn-outline" onclick="showPage('vacancies')">Открытые вакансии</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><label>// Проект основан</label><strong>2022</strong></div>
+      <div class="stat-item"><label>// Участников</label><strong>70+</strong></div>
+      <div class="stat-item"><label>// OST треков</label><strong>40+</strong></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-tag">// О проекте</div>
+    <h2 class="section-title">Что такое Konstart Project?</h2>
+    <p class="section-sub">Это не просто сервер — это проект с полноценной командой, документацией, официальным саундтреком и структурой организации. G.L.o.B. org. развивает его как полноценное медиа-произведение.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">⬛</div>
+        <div class="card-title">Строительство</div>
+        <div class="card-text">Масштабные постройки, города и архитектурные объекты внутри игры. Каждый объект — часть единой вселенной.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">♪</div>
+        <div class="card-title">Официальный OST</div>
+        <div class="card-text">Два тома оригинального саундтрека, созданного специально для проекта авторским коллективом.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">◈</div>
+        <div class="card-title">Организация</div>
+        <div class="card-text">Чёткая структура, официальные документы, договоры и роли. Работаем как настоящая студия.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">✦</div>
+        <div class="card-title">Открытый набор</div>
+        <div class="card-text">Ищем строителей, дизайнеров, музыкантов, сценаристов и других специалистов для совместной работы.</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- NEWS PAGE -->
+<div id="page-news" class="page">
+  <section class="section" style="padding-top:4rem">
+    <div class="section-tag">// Новости</div>
+    <h2 class="section-title">Последние обновления</h2>
+    <div class="news-list">
+      <div class="news-item">
+        <div class="news-date">25.08.2023</div>
+        <div>
+          <div class="news-tag">РЕЛИЗ</div>
+          <div class="news-title">Вышел KONSTART PROJECT OST VOL 1</div>
+          <div class="news-preview">Первый том официального саундтрека проекта. Авторы: Валентина Лисицина, Ханлар Алиментов, Михаил Бедарев, Артём Кириллов и другие.</div>
+        </div>
+      </div>
+      <div class="news-item">
+        <div class="news-date">01.01.2023</div>
+        <div>
+          <div class="news-tag">РЕЛИЗ</div>
+          <div class="news-title">Вышел KONSTART PROJECT OST VOL 2</div>
+          <div class="news-preview">Второй том саундтрека расширяет музыкальную вселенную проекта новыми треками и авторами.</div>
+        </div>
+      </div>
+      <div class="news-item">
+        <div class="news-date">2025</div>
+        <div>
+          <div class="news-tag">ОБНОВЛЕНИЕ</div>
+          <div class="news-title">Открыт новый набор в команду</div>
+          <div class="news-preview">Проект расширяется. Открыты новые вакансии для желающих совместно работать над Konstart Project.</div>
+        </div>
+      </div>
+      <div class="news-item">
+        <div class="news-date">2025</div>
+        <div>
+          <div class="news-tag">РЕЛИЗ</div>
+          <div class="news-title">ANBEL TUNES — новый OST</div>
+          <div class="news-preview">G.L.o.B. org. выпустили новый сборник треков ANBEL TUNES в рамках расширенной музыкальной программы.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- VACANCIES PAGE -->
+<div id="page-vacancies" class="page">
+  <section class="section" style="padding-top:4rem">
+    <div class="section-tag">// Вакансии</div>
+    <h2 class="section-title">Присоединись к команде</h2>
+    <p class="section-sub">Мы ищем людей, готовых работать серьёзно. Все участники подписывают официальный договор.</p>
+    <div class="vacancy-grid">
+      <div class="vacancy-card" onclick="openRegistration()">
+        <h4>Строитель</h4>
+        <p>Возведение построек, районов и объектов в игровом мире</p>
+        <div class="vacancy-badge badge-open">ОТКРЫТА</div>
+      </div>
+      <div class="vacancy-card" onclick="openRegistration()">
+        <h4>Дизайнер</h4>
+        <p>Разработка визуального стиля, текстур, интерфейсов</p>
+        <div class="vacancy-badge badge-open">ОТКРЫТА</div>
+      </div>
+      <div class="vacancy-card" onclick="openRegistration()">
+        <h4>Музыкант / Композитор</h4>
+        <p>Создание треков для официального OST проекта</p>
+        <div class="vacancy-badge badge-open">ОТКРЫТА</div>
+      </div>
+      <div class="vacancy-card" onclick="openRegistration()">
+        <h4>Сценарист</h4>
+        <p>Создание лора, историй и документации вселенной</p>
+        <div class="vacancy-badge badge-open">ОТКРЫТА</div>
+      </div>
+      <div class="vacancy-card" onclick="openRegistration()">
+        <h4>Программист</h4>
+        <p>Разработка плагинов, скриптов и технической части</p>
+        <div class="vacancy-badge badge-open">ОТКРЫТА</div>
+      </div>
+      <div class="vacancy-card" onclick="openRegistration()">
+        <h4>Оператор / Монтажёр</h4>
+        <p>Съёмка и монтаж видеоматериалов о проекте</p>
+        <div class="vacancy-badge badge-open">ОТКРЫТА</div>
+      </div>
+      <div class="vacancy-card" onclick="openRegistration()">
+        <h4>Администратор</h4>
+        <p>Управление сервером, модерация, работа с командой</p>
+        <div class="vacancy-badge badge-closed">ЗАНЯТА</div>
+      </div>
+      <div class="vacancy-card" onclick="openRegistration()">
+        <h4>Художник</h4>
+        <p>Создание арта, иллюстраций, концептов для проекта</p>
+        <div class="vacancy-badge badge-open">ОТКРЫТА</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- DOCS PAGE -->
+<div id="page-docs" class="page">
+  <section class="section" style="padding-top:4rem">
+    <div class="section-tag">// Документы</div>
+    <h2 class="section-title">Официальная документация</h2>
+    <div class="news-list">
+      <div class="news-item">
+        <div class="news-date">DOC</div>
+        <div>
+          <div class="news-title">Пользовательское соглашение</div>
+          <div class="news-preview">Условия использования сервисов и участия в проекте Konstart Project.</div>
+        </div>
+      </div>
+      <div class="news-item">
+        <div class="news-date">DOC</div>
+        <div>
+          <div class="news-title">ЛСКП — Лицензионное соглашение</div>
+          <div class="news-preview">Лицензионное соглашение контрибьютора проекта. Обязательно к ознакомлению перед регистрацией.</div>
+        </div>
+      </div>
+      <div class="news-item">
+        <div class="news-date">DOC</div>
+        <div>
+          <div class="news-title">Договор участника</div>
+          <div class="news-preview">Официальный договор, который подписывается при вступлении в команду проекта.</div>
+        </div>
+      </div>
+      <div class="news-item">
+        <div class="news-date">DOC</div>
+        <div>
+          <div class="news-title">Путеводитель по проекту</div>
+          <div class="news-preview">Полное руководство для новых участников: как устроен проект, правила, структура команды.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- OST PAGE -->
+<div id="page-ost" class="page">
+  <section class="section" style="padding-top:4rem">
+    <div class="section-tag">// Официальный саундтрек</div>
+    <h2 class="section-title">KONSTART PROJECT OST</h2>
+    <p class="section-sub">Оригинальная музыка, созданная специально для проекта командой G.L.o.B. org. Доступна на Bandcamp.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">▶</div>
+        <div class="card-title">OST VOL 1</div>
+        <div class="card-text">Август 2023. Первый том официального саундтрека. Авторы: Валентина Лисицина, Ханлар Алиментов, Михаил Бедарев, Артём Кириллов.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">▶</div>
+        <div class="card-title">OST VOL 2</div>
+        <div class="card-text">Январь 2023. Второй том с расширенным составом авторов и новыми темами для игрового мира.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">▶</div>
+        <div class="card-title">ANBEL TUNES</div>
+        <div class="card-text">Март 2025. Расширенный сборник треков в рамках музыкальной программы G.L.o.B. org.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">▶</div>
+        <div class="card-title">CUBE OST</div>
+        <div class="card-text">Май 2025. Последний выпущенный том — саундтрек CUBE для внутриигрового пространства.</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <span>© KONSTART PROJECT / G.L.o.B. org.</span>
+  <div style="display:flex;gap:2rem">
+    <a href="#" onclick="showPage('docs')">Документы</a>
+    <a href="#">globorgofficial@gmail.com</a>
+  </div>
+</footer>
+
+<!-- =================== REGISTRATION OVERLAY =================== -->
+<div class="overlay" id="overlay-reg">
+<div class="modal">
+  <button class="modal-close" onclick="closeOverlay('overlay-reg')">✕</button>
+  <div id="reg-step1">
+    <div class="modal-step">// ШАГ 1 ИЗ 3</div>
+    <div class="modal-title">Заявка на участие</div>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:1.5rem;line-height:1.7">Заполните форму. После проверки данных откроется следующий этап.</p>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Фамилия *</label>
+        <input type="text" id="r-lastname" placeholder="Иванов">
+      </div>
+      <div class="form-group">
+        <label>Имя *</label>
+        <input type="text" id="r-firstname" placeholder="Иван">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Отчество</label>
+      <input type="text" id="r-middlename" placeholder="Иванович">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Email *</label>
+        <input type="email" id="r-email" placeholder="mail@example.com">
+      </div>
+      <div class="form-group">
+        <label>Телефон *</label>
+        <input type="tel" id="r-phone" placeholder="+7 900 000 00 00">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Дата рождения *</label>
+        <input type="date" id="r-dob">
+      </div>
+      <div class="form-group">
+        <label>Страна проживания *</label>
+        <select id="r-country">
+          <option value="">— выберите —</option>
+          <option>Россия</option><option>Беларусь</option><option>Казахстан</option>
+          <option>Армения</option><option>Азербайджан</option><option>Грузия</option>
+          <option>Молдова</option><option>Узбекистан</option><option>Таджикистан</option>
+          <option>Кыргызстан</option><option>Туркменистан</option><option>Германия</option>
+          <option>Франция</option><option>Италия</option><option>Испания</option>
+          <option>Нидерланды</option><option>Бельгия</option><option>Австрия</option>
+          <option>Швейцария</option><option>Швеция</option><option>Норвегия</option>
+          <option>Финляндия</option><option>Дания</option><option>США</option>
+          <option>Канада</option><option>Австралия</option><option>Бразилия</option>
+          <option>Аргентина</option><option>Турция</option><option>Израиль</option>
+          <option>Китай</option><option>Япония</option><option>Корея</option>
+          <option>Другая страна</option>
+          <option value="BLOCKED">Украина</option>
+          <option value="BLOCKED">Польша</option>
+          <option value="BLOCKED">Латвия</option>
+          <option value="BLOCKED">Литва</option>
+          <option value="BLOCKED">Монако</option>
+          <option value="BLOCKED">Эстония</option>
+          <option value="BLOCKED">Чехия</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Желаемая вакансия *</label>
+      <select id="r-vacancy">
+        <option value="">— выберите —</option>
+        <option>Строитель</option><option>Дизайнер</option><option>Музыкант / Композитор</option>
+        <option>Сценарист</option><option>Программист</option><option>Оператор / Монтажёр</option>
+        <option>Художник</option><option>Другое</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Ваши качества и умения *</label>
+      <textarea id="r-skills" placeholder="Опишите свои навыки, опыт и то, что вы можете привнести в проект..."></textarea>
+    </div>
+    <div class="checkbox-group">
+      <input type="checkbox" id="r-agree1">
+      <label for="r-agree1">Я прочитал(-а) и соглашаюсь с <a href="#" onclick="showPage('docs');closeOverlay('overlay-reg')">Пользовательским соглашением</a> и <a href="#" onclick="showPage('docs');closeOverlay('overlay-reg')">ЛСКП</a></label>
+    </div>
+    <div class="checkbox-group">
+      <input type="checkbox" id="r-agree2">
+      <label for="r-agree2">Я подтверждаю, что при подписании документов буду использовать свою настоящую (подлинную) подпись</label>
+    </div>
+    <div id="r-step1-error" class="form-error"></div>
+    <div style="margin-top:1.5rem;display:flex;gap:1rem">
+      <button class="btn-primary" onclick="submitStep1()">Продолжить →</button>
+      <button class="btn-outline" onclick="closeOverlay('overlay-reg')">Отмена</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: passport -->
+  <div id="reg-step2" style="display:none">
+    <div class="modal-step">// ШАГ 2 ИЗ 3 — ПАСПОРТНЫЕ ДАННЫЕ</div>
+    <div class="modal-title">Персональные данные</div>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:1.5rem;line-height:1.7">Данные необходимы для составления официального договора. Хранятся конфиденциально.</p>
+    <div class="form-group">
+      <label>ФИО полностью (как в паспорте) *</label>
+      <input type="text" id="p-fio" placeholder="Иванов Иван Иванович">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Серия паспорта *</label>
+        <input type="text" id="p-series" placeholder="0000" maxlength="4">
+      </div>
+      <div class="form-group">
+        <label>Номер паспорта *</label>
+        <input type="text" id="p-number" placeholder="000000" maxlength="6">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Дата рождения (в паспорте) *</label>
+      <input type="date" id="p-dob">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Дата выдачи *</label>
+        <input type="date" id="p-issue-date">
+      </div>
+      <div class="form-group">
+        <label>Кем выдан *</label>
+        <input type="text" id="p-issued-by" placeholder="МВД России...">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Адрес регистрации *</label>
+      <input type="text" id="p-address" placeholder="г. Москва, ул. Примерная, д. 1, кв. 1">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Банковский счёт *</label>
+        <input type="text" id="p-bank-acc" placeholder="40817810...">
+      </div>
+      <div class="form-group">
+        <label>Название банка *</label>
+        <input type="text" id="p-bank-name" placeholder="Сбербанк">
+      </div>
+    </div>
+    <div id="r-step2-error" class="form-error"></div>
+    <div style="margin-top:1.5rem;display:flex;gap:1rem">
+      <button class="btn-primary" onclick="submitStep2()">К договору →</button>
+      <button class="btn-outline" onclick="goBackStep1()">← Назад</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: contract + signature -->
+  <div id="reg-step3" style="display:none">
+    <div class="modal-step">// ШАГ 3 ИЗ 3 — ПОДПИСАНИЕ ДОГОВОРА</div>
+    <div class="modal-title">Договор участника</div>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:1rem;line-height:1.7">Ознакомьтесь с договором и подпишите его ниже.</p>
+    <div class="contract-doc" id="contract-text"></div>
+    <div class="sig-warning">Подписывая данный документ вы настоящим соглашаетесь с его условиями, подтверждаете что оставленная вами подлинность истинная, и что вы полностью прочитали договор до его подписания.</div>
+    <div class="form-group"><label>Ваша подпись *</label></div>
+    <div class="sig-area">
+      <canvas id="sig-canvas"></canvas>
+    </div>
+    <div class="sig-actions">
+      <button class="btn-sm" onclick="clearSig()">Очистить</button>
+    </div>
+    <div id="r-step3-error" class="form-error"></div>
+    <div style="margin-top:1.5rem;display:flex;gap:1rem;flex-wrap:wrap">
+      <button class="btn-primary" onclick="submitStep3()">Подписать и отправить ✓</button>
+      <button class="btn-outline" onclick="goBackStep2()">← Назад</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: blocked country -->
+  <div id="reg-blocked" style="display:none">
+    <div class="modal-step">// РЕГИСТРАЦИЯ НЕДОСТУПНА</div>
+    <div class="modal-title">Ваша страна не поддерживается</div>
+    <p style="font-size:12px;color:var(--muted);margin-top:1rem;line-height:1.8">К сожалению, регистрация участников из данной страны временно недоступна.<br><br>Если у вас есть вопросы, свяжитесь с нами: <span style="color:var(--accent)">globorgofficial@gmail.com</span></p>
+    <div style="margin-top:1.5rem">
+      <button class="btn-outline" onclick="closeOverlay('overlay-reg')">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="reg-success" style="display:none">
+    <div class="success-box">
+      <div class="check">✓</div>
+      <h3>Регистрация завершена!</h3>
+      <p>Договор и данные для входа отправлены на ваш email. Также копия договора направлена в G.L.o.B. org.</p>
+      <div class="creds-box">
+        <div class="cred-row"><span class="cred-label">Логин</span><span class="cred-val" id="out-login"></span></div>
+        <div class="cred-row"><span class="cred-label">Пароль</span><span class="cred-val" id="out-pass"></span></div>
+      </div>
+      <p style="font-size:10px;color:var(--muted)">Сохраните данные — они не будут показаны повторно.</p>
+      <button class="btn-outline" onclick="closeOverlay('overlay-reg')" style="margin-top:1rem">Закрыть</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+// PRE-GENERATED ACCOUNTS POOL (70 accounts)
+const accountPool = (function(){
+  const chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+  const alpha='abcdefghijklmnopqrstuvwxyz0123456789';
+  function rnd(set,n){let s='';for(let i=0;i<n;i++)s+=set[Math.floor(Math.random()*set.length)];return s;}
+  const pool=[];
+  for(let i=0;i<70;i++){
+    pool.push({login:'ksp_'+rnd(alpha,6),password:rnd(chars,14),used:false});
+  }
+  return pool;
+})();
+
+function getFreeAccount(){
+  const free=accountPool.filter(a=>!a.used);
+  if(!free.length)return{login:'ksp_'+Math.random().toString(36).slice(2,8),password:Math.random().toString(36).slice(2,16)};
+  const acc=free[Math.floor(Math.random()*free.length)];
+  acc.used=true;
+  return acc;
+}
+
+// NAV
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  window.scrollTo(0,0);
+  return false;
+}
+
+// OVERLAY
+function openRegistration(){
+  resetRegistration();
+  document.getElementById('overlay-reg').classList.add('open');
+}
+function closeOverlay(id){document.getElementById(id).classList.remove('open');}
+
+document.getElementById('overlay-reg').addEventListener('click',function(e){
+  if(e.target===this)closeOverlay('overlay-reg');
+});
+
+function resetRegistration(){
+  ['reg-step1','reg-step2','reg-step3','reg-blocked','reg-success'].forEach(id=>{
+    document.getElementById(id).style.display='none';
+  });
+  document.getElementById('reg-step1').style.display='block';
+  document.querySelectorAll('.form-error').forEach(e=>{e.classList.remove('show');e.textContent='';});
+}
+
+function showReg(id){
+  ['reg-step1','reg-step2','reg-step3','reg-blocked','reg-success'].forEach(i=>{
+    document.getElementById(i).style.display='none';
+  });
+  document.getElementById(id).style.display='block';
+  document.querySelector('.modal').scrollTop=0;
+}
+
+// STEP 1
+const BLOCKED_COUNTRIES=['BLOCKED'];
+function submitStep1(){
+  const err=document.getElementById('r-step1-error');
+  err.classList.remove('show');
+  const ln=document.getElementById('r-lastname').value.trim();
+  const fn=document.getElementById('r-firstname').value.trim();
+  const email=document.getElementById('r-email').value.trim();
+  const phone=document.getElementById('r-phone').value.trim();
+  const dob=document.getElementById('r-dob').value;
+  const country=document.getElementById('r-country').value;
+  const vacancy=document.getElementById('r-vacancy').value;
+  const skills=document.getElementById('r-skills').value.trim();
+  const a1=document.getElementById('r-agree1').checked;
+  const a2=document.getElementById('r-agree2').checked;
+  if(!ln||!fn||!email||!phone||!dob||!country||!vacancy||!skills){
+    err.textContent='Заполните все обязательные поля.';err.classList.add('show');return;
+  }
+  if(!a1||!a2){err.textContent='Необходимо отметить оба подтверждения.';err.classList.add('show');return;}
+  if(country==='BLOCKED'){showReg('reg-blocked');return;}
+  const age=Math.floor((new Date()-new Date(dob))/(365.25*24*3600*1000));
+  if(age<18){err.textContent='Регистрация доступна только совершеннолетним (18+).';err.classList.add('show');return;}
+  showReg('reg-step2');
+}
+function goBackStep1(){showReg('reg-step1');}
+
+// STEP 2
+function submitStep2(){
+  const err=document.getElementById('r-step2-error');err.classList.remove('show');
+  const fields=['p-fio','p-series','p-number','p-dob','p-issue-date','p-issued-by','p-address','p-bank-acc','p-bank-name'];
+  for(const f of fields){
+    if(!document.getElementById(f).value.trim()){err.textContent='Заполните все поля.';err.classList.add('show');return;}
+  }
+  generateContract();
+  showReg('reg-step3');
+  initSig();
+}
+function goBackStep2(){showReg('reg-step2');}
+
+// CONTRACT GENERATION
+function generateContract(){
+  const today=new Date();
+  const dateStr=today.toLocaleDateString('ru-RU');
+  const fio=document.getElementById('p-fio').value.trim();
+  const series=document.getElementById('p-series').value.trim();
+  const num=document.getElementById('p-number').value.trim();
+  const dob=new Date(document.getElementById('p-dob').value).toLocaleDateString('ru-RU');
+  const issDate=new Date(document.getElementById('p-issue-date').value).toLocaleDateString('ru-RU');
+  const issBy=document.getElementById('p-issued-by').value.trim();
+  const addr=document.getElementById('p-address').value.trim();
+  const bankAcc=document.getElementById('p-bank-acc').value.trim();
+  const bankName=document.getElementById('p-bank-name').value.trim();
+  const vacancy=document.getElementById('r-vacancy').value;
+  document.getElementById('contract-text').innerHTML=`
+<h2>ДОГОВОР ОБ УЧАСТИИ В ПРОЕКТЕ</h2>
+<p>Дата составления: <span class="field">${dateStr}</span></p>
+<p><strong>KONSTART PROJECT</strong> (далее — «Проект»), в лице организации G.L.o.B. org., с одной стороны, и</p>
+<p>Гражданин(ка): <span class="field">${fio}</span>, дата рождения: <span class="field">${dob}</span>, паспорт серия <span class="field">${series}</span> № <span class="field">${num}</span>, выдан <span class="field">${issDate}</span> органом: <span class="field">${issBy}</span>, зарегистрирован(а) по адресу: <span class="field">${addr}</span> (далее — «Участник»), с другой стороны, заключили настоящий Договор о нижеследующем:</p>
+<p><strong>1. ПРЕДМЕТ ДОГОВОРА</strong><br>Участник вступает в состав команды KONSTART PROJECT на должность: <span class="field">${vacancy}</span>, и обязуется добросовестно выполнять обязанности, соответствующие данной роли.</p>
+<p><strong>2. УСЛОВИЯ УЧАСТИЯ</strong><br>Участник подтверждает ознакомление с Пользовательским соглашением и ЛСКП проекта, и выражает своё полное согласие с их условиями.</p>
+<p><strong>3. КОНФИДЕНЦИАЛЬНОСТЬ</strong><br>Стороны обязуются соблюдать конфиденциальность в отношении внутренней информации проекта.</p>
+<p><strong>4. БАНКОВСКИЕ РЕКВИЗИТЫ УЧАСТНИКА</strong><br>Банк: <span class="field">${bankName}</span>, счёт: <span class="field">${bankAcc}</span>.</p>
+<p><strong>5. СРОК ДЕЙСТВИЯ</strong><br>Договор вступает в силу с момента подписания и действует до его расторжения по взаимному согласию сторон.</p>
+<p><strong>6. ПОДПИСИ СТОРОН</strong></p>
+<p>G.L.o.B. org. / KONSTART PROJECT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Участник: <span class="field">${fio}</span></p>
+<p style="margin-top:2rem;font-size:11px;color:#888">Дата: ${dateStr}</p>
+`;
+}
+
+// SIGNATURE
+let sigCanvas,sigCtx,sigDrawing=false,sigEmpty=true;
+function initSig(){
+  sigCanvas=document.getElementById('sig-canvas');
+  sigCtx=sigCanvas.getContext('2d');
+  const rect=sigCanvas.getBoundingClientRect();
+  sigCanvas.width=rect.width||600;
+  sigCanvas.height=180;
+  sigCtx.fillStyle='#fff';
+  sigCtx.fillRect(0,0,sigCanvas.width,sigCanvas.height);
+  sigCtx.strokeStyle='#111';sigCtx.lineWidth=2;sigCtx.lineCap='round';sigCtx.lineJoin='round';
+  sigEmpty=true;
+  sigCanvas.onmousedown=e=>{sigDrawing=true;sigCtx.beginPath();const r=sigCanvas.getBoundingClientRect();sigCtx.moveTo(e.clientX-r.left,e.clientY-r.top);};
+  sigCanvas.onmousemove=e=>{if(!sigDrawing)return;sigEmpty=false;const r=sigCanvas.getBoundingClientRect();sigCtx.lineTo(e.clientX-r.left,e.clientY-r.top);sigCtx.stroke();};
+  sigCanvas.onmouseup=()=>sigDrawing=false;
+  sigCanvas.onmouseleave=()=>sigDrawing=false;
+  sigCanvas.ontouchstart=e=>{e.preventDefault();sigDrawing=true;sigCtx.beginPath();const r=sigCanvas.getBoundingClientRect();const t=e.touches[0];sigCtx.moveTo(t.clientX-r.left,t.clientY-r.top);};
+  sigCanvas.ontouchmove=e=>{e.preventDefault();if(!sigDrawing)return;sigEmpty=false;const r=sigCanvas.getBoundingClientRect();const t=e.touches[0];sigCtx.lineTo(t.clientX-r.left,t.clientY-r.top);sigCtx.stroke();};
+  sigCanvas.ontouchend=()=>sigDrawing=false;
+}
+function clearSig(){
+  if(!sigCanvas)return;
+  sigCtx.fillStyle='#fff';sigCtx.fillRect(0,0,sigCanvas.width,sigCanvas.height);
+  sigEmpty=true;
+}
+
+// STEP 3 SUBMIT
+function submitStep3(){
+  const err=document.getElementById('r-step3-error');err.classList.remove('show');
+  if(sigEmpty){err.textContent='Пожалуйста, поставьте подпись.';err.classList.add('show');return;}
+  const acc=getFreeAccount();
+  document.getElementById('out-login').textContent=acc.login;
+  document.getElementById('out-pass').textContent=acc.password;
+  showReg('reg-success');
+}
+</script>
+</body>
 </html>
